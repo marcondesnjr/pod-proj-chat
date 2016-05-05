@@ -29,24 +29,20 @@ import nu.xom.Serializer;
  *
  * @author José Marcondes do Nascimento Junior
  */
-public class GerenciadorDadosUsuario {
+public class UsuarioGerenciador {
 
     private Repositorio repositorio;
 
-    public GerenciadorDadosUsuario(GDriveRepositorio repositorio) {
+    public UsuarioGerenciador(Repositorio repositorio) {
         this.repositorio = repositorio;
     }
 
-    public static void main(String[] args) throws Exception {
-        new GerenciadorDadosUsuario(new GDriveRepositorio()).cadastrarUsuario("nome", "email3@email.com", "3senha");
-    }
-
     public String cadastrarUsuario(String nome, String email, String senha) throws Exception {
-        
+
         UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
-        InputStream is = new FileInputStream(new GDriveRepositorio().downloadFile(BibliotecaArquivos.USUARIOS));
+        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
 
         Document doc = builder.build(is);
 
