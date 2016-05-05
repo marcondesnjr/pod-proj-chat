@@ -27,12 +27,15 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
@@ -47,7 +50,7 @@ import java.util.logging.Logger;
  *
  * @author José Marcondes do Nascimento Junior
  */
-public class GDrive {
+public class GDrive implements Repositorio{
 
     private static final String usrFile = "0B9cCXHDSR9etVEFyTUdwQW9PM0E";
 
@@ -151,19 +154,27 @@ public class GDrive {
 //            }
 //        }
 //    }
+    
     public static void main(String[] args) throws Exception {
+        java.io.File fl = new GDrive().downloadUsersFile();
+        System.out.println(fl.getAbsolutePath());
+    }
+    public void updateUsersFile(java.io.File fl) throws FileNotFoundException, Exception {
         File body = new File();
-            body.setTitle("usuarios.xml");
-            body.setMimeType("text/xml");
-        URL url = GDrive.class.getResource("/uploads/usuarios.xml");
-        System.out.println(url);
-        InputStreamContent mediaContent = new InputStreamContent("text/xml", new BufferedInputStream(new FileInputStream(url.getFile())));
-        new GDrive().fileUpload(body, mediaContent);
+        body.setTitle("usuarios.xml");
+        body.setMimeType("text/xml");
+        InputStreamContent mediaContent = new InputStreamContent("text/xml", new BufferedInputStream(new FileInputStream(fl)));
+        Drive.Files.Update request = getDriveService().files().update(usrFile, body, mediaContent);
+        request.execute();
     }
 
-    public void fileUpload(File mediaFile, AbstractInputStreamContent aisc) throws FileNotFoundException, Exception {
-        Drive.Files.Update request = getDriveService().files().update(usrFile, mediaFile, aisc);
-        request.execute();
+    public java.io.File downloadUsersFile() throws Exception {
+        File userFilesMeta = getDriveService().files().get(usrFile).execute();
+        OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/usuarios.xml").getFile());
+        MediaHttpDownloader downloader = new MediaHttpDownloader(HTTP_TRANSPORT, getDriveService().getRequestFactory().getInitializer());
+        downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
+        return new java.io.File(this.getClass().getResource("/downloads/usuarios.xml").getFile());
+    
     }
 
 }
