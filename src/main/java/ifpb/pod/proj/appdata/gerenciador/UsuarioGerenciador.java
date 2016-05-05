@@ -6,7 +6,7 @@
 package ifpb.pod.proj.appdata.gerenciador;
 
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
-import ifpb.pod.proj.appdata.googledrive.GDriveRepositorio;
+import ifpb.pod.proj.appdata.repositorio.GDriveRepositorio;
 import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
@@ -19,11 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+import nu.xom.ParsingException;
 import nu.xom.Serializer;
+import nu.xom.ValidityException;
 
 /**
  *
@@ -31,10 +34,9 @@ import nu.xom.Serializer;
  */
 public class UsuarioGerenciador {
 
-    
     public String cadastrarUsuario(String nome, String email, String senha) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
-        
+
         UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
@@ -60,7 +62,7 @@ public class UsuarioGerenciador {
 
     public void escreverUsuario(List<Map<String, String>> list) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
-        
+
         Element root = new Element("usuarios");
         for (Map<String, String> map : list) {
             Element usrEl = new Element("usuario");
@@ -113,5 +115,20 @@ public class UsuarioGerenciador {
             list.add(map);
         }
         return list;
+    }
+
+    public List<Map<String, String>> listaUsuarioPorGrupo(Document doc, String grupoID) throws Exception {
+        Repositorio repositorio = new GDriveRepositorio();
+        List<Map<String, String>> all = this.listarUsuarios(doc);
+
+        all.removeIf((Map<String, String> t) -> {
+            if (t.get("grupoId").equals(grupoID)) {
+                return false;
+            } else {
+                return true;
+            }
+        });
+        
+        return all;
     }
 }

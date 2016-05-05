@@ -5,8 +5,9 @@
  */
 package ifpb.pod.proj.appdata.gerenciador;
 
-import ifpb.pod.proj.appdata.googledrive.GDriveRepositorio;
+import ifpb.pod.proj.appdata.repositorio.GDriveRepositorio;
 import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
+import ifpb.pod.proj.appdata.repositorio.DBoxRepositorio;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,6 +51,30 @@ public class MensagemGerenciador {
         list.add(map);
 
         escreverMensagem(list);
+
+        System.out.println(list);
+        return id.toString();
+    }
+
+    public String cadastrarMensagemUsuario(String msgId, String usrId, String status) throws Exception {
+        Repositorio repositorio = new DBoxRepositorio();
+        UUID id = UUID.randomUUID();
+
+        Builder builder = new Builder();
+        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.MENSAGEM_USUARIO));
+
+        Document doc = builder.build(is);
+
+        List<Map<String, String>> list = listarMensagens(doc);
+
+        HashMap<String, String> map = new HashMap();
+        map.put("mensagemId", msgId);
+        map.put("usuarioId", usrId);
+        map.put("status", status);
+
+        list.add(map);
+
+        escreverMensagemUsuario(list);
 
         System.out.println(list);
         return id.toString();
@@ -109,5 +134,62 @@ public class MensagemGerenciador {
         }
 
         repositorio.updateFile(usrFile, BibliotecaArquivos.MENSAGENS);
+    }
+
+    public void escreverMensagemUsuario(List<Map<String, String>> list) throws Exception {
+        Repositorio repositorio = new DBoxRepositorio();
+
+        Element root = new Element("mensagensUsuario");
+        for (Map<String, String> map : list) {
+            Element mensagemUsuarioEl = new Element("mensagemUsuario");
+
+            Element msgId = new Element("mensagemId");
+            msgId.appendChild(map.get("mensagemId"));
+
+            Element usuarioIdEl = new Element("usuarioId");
+            usuarioIdEl.appendChild(map.get("usuarioId"));
+
+            Element statusEl = new Element("status");
+            statusEl.appendChild(map.get("status"));
+
+            mensagemUsuarioEl.appendChild(msgId);
+            mensagemUsuarioEl.appendChild(usuarioIdEl);
+            mensagemUsuarioEl.appendChild(statusEl);
+
+            root.appendChild(mensagemUsuarioEl);
+        }
+
+        Document doc = new Document(root);
+
+        File usrFile = new File(this.getClass().getResource("/uploads/mensagem_usuario.xml").getFile());
+
+        try {
+            Serializer serializer = new Serializer(new FileOutputStream(usrFile), "UTF-8");
+            serializer.setIndent(4);
+            serializer.setMaxLength(64);
+            serializer.write(doc);
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
+
+        repositorio.updateFile(usrFile, BibliotecaArquivos.MENSAGEM_USUARIO);
+    }
+
+    public List<Map<String, String>> listarMensagensUsuario(Document doc) {
+        Element root = doc.getRootElement();
+        Elements childs = root.getChildElements("mensagemUsuario");
+        List<Map<String, String>> list = new ArrayList<>();
+        for (int i = 0; i < childs.size(); i++) {
+            Element atual = childs.get(i);
+            HashMap<String, String> map = new HashMap<>();
+            String mensagemId = atual.getChild(1).getValue();
+            String usuarioId = atual.getChild(3).getValue();
+            String status = atual.getChild(5).getValue();
+            map.put("mensagemId", mensagemId);
+            map.put("usuarioId", usuarioId);
+            map.put("status", status);
+            list.add(map);
+        }
+        return list;
     }
 }
