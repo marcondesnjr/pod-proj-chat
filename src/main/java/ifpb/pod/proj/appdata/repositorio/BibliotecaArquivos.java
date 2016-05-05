@@ -5,15 +5,10 @@
  */
 package ifpb.pod.proj.appdata.repositorio;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 /**
  *
  * @author José Marcondes do Nascimento Junior
  */
-public interface Repositorio {
-
-    void updateFile(File fl, BibliotecaArquivos b) throws Exception;
-    File downloadFile(BibliotecaArquivos b) throws Exception;
+public enum BibliotecaArquivos {
+    USUARIOS,MENSAGENS,NOTIFICACOES
 }

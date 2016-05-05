@@ -27,6 +27,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -36,21 +37,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author José Marcondes do Nascimento Junior
  */
-public class GDrive implements Repositorio{
+public class GDriveRepositorio implements Repositorio {
 
     private static final String usrFile = "0B9cCXHDSR9etVEFyTUdwQW9PM0E";
 
@@ -127,7 +121,7 @@ public class GDrive implements Repositorio{
      * @return an authorized Drive client service
      * @throws IOException
      */
-    public Drive getDriveService() throws IOException, Exception {
+    private Drive getDriveService() throws IOException, Exception {
         Credential credential = authorize();
         return new Drive.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, credential)
@@ -154,12 +148,14 @@ public class GDrive implements Repositorio{
 //            }
 //        }
 //    }
-    
-    public static void main(String[] args) throws Exception {
-        java.io.File fl = new GDrive().downloadUsersFile();
-        System.out.println(fl.getAbsolutePath());
+    @Override
+    public void updateFile(java.io.File fl, BibliotecaArquivos b) throws FileNotFoundException, Exception {
+        if (b == b.USUARIOS) {
+            updateUsrFile(fl);
+        }
     }
-    public void updateUsersFile(java.io.File fl) throws FileNotFoundException, Exception {
+
+    private void updateUsrFile(java.io.File fl) throws IOException, Exception, FileNotFoundException {
         File body = new File();
         body.setTitle("usuarios.xml");
         body.setMimeType("text/xml");
@@ -168,13 +164,22 @@ public class GDrive implements Repositorio{
         request.execute();
     }
 
-    public java.io.File downloadUsersFile() throws Exception {
+    @Override
+    public java.io.File downloadFile(BibliotecaArquivos b) throws Exception {
+        if (b == b.USUARIOS) {
+            return dowloadUsersFile();
+        } else {
+            return null;
+        }
+
+    }
+
+    private java.io.File dowloadUsersFile() throws IOException, Exception, FileNotFoundException {
         File userFilesMeta = getDriveService().files().get(usrFile).execute();
         OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/usuarios.xml").getFile());
         MediaHttpDownloader downloader = new MediaHttpDownloader(HTTP_TRANSPORT, getDriveService().getRequestFactory().getInitializer());
         downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
         return new java.io.File(this.getClass().getResource("/downloads/usuarios.xml").getFile());
-    
     }
 
 }

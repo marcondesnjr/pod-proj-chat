@@ -6,7 +6,8 @@
 package ifpb.pod.proj.appdata.gerenciador;
 
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
-import ifpb.pod.proj.appdata.googledrive.GDrive;
+import ifpb.pod.proj.appdata.googledrive.GDriveRepositorio;
+import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,12 +33,12 @@ public class GerenciadorDadosUsuario {
 
     private Repositorio repositorio;
 
-    public GerenciadorDadosUsuario(GDrive repositorio) {
+    public GerenciadorDadosUsuario(GDriveRepositorio repositorio) {
         this.repositorio = repositorio;
     }
 
     public static void main(String[] args) throws Exception {
-        new GerenciadorDadosUsuario(new GDrive()).cadastrarUsuario("nome", "email3@email.com", "3senha");
+        new GerenciadorDadosUsuario(new GDriveRepositorio()).cadastrarUsuario("nome", "email3@email.com", "3senha");
     }
 
     public String cadastrarUsuario(String nome, String email, String senha) throws Exception {
@@ -45,7 +46,7 @@ public class GerenciadorDadosUsuario {
         UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
-        InputStream is = new FileInputStream(new GDrive().downloadUsersFile());
+        InputStream is = new FileInputStream(new GDriveRepositorio().downloadFile(BibliotecaArquivos.USUARIOS));
 
         Document doc = builder.build(is);
 
@@ -96,7 +97,7 @@ public class GerenciadorDadosUsuario {
             System.err.println(ex);
         }
 
-        repositorio.updateUsersFile(usrFile);
+        repositorio.updateFile(usrFile, BibliotecaArquivos.USUARIOS);
     }
 
     public List<Map<String, String>> listarUsuarios(Document doc) {
