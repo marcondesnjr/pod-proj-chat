@@ -25,6 +25,7 @@ public class SocketServerS {
     public void init() throws IOException {
         ServerSocket serverSocket = new ServerSocket(10999);
         while (true) {
+            String resp = null;
             Socket socket = serverSocket.accept();
             new ExecComand(socket).start();
         }
@@ -46,6 +47,13 @@ public class SocketServerS {
                 Map<String, String> map = StringCommand.convert(new String(b).trim());
                 if (map.get("command").equals("cadastrarUsuario")) {
                     new UsuarioGerenciador().cadastrarUsuario(map.get("nome"), map.get("email"), map.get("senha"));
+                }else if(map.get("command").equals("hasUsuario")){
+                    Map<String,String> usr = new UsuarioGerenciador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
+                    if(usr != null)
+                        socket.getOutputStream().write("true".getBytes());
+                    else{
+                        socket.getOutputStream().write("false".getBytes());
+                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);

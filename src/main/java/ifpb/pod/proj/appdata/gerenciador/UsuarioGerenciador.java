@@ -117,8 +117,9 @@ public class UsuarioGerenciador {
         return list;
     }
 
-    public List<Map<String, String>> listaUsuarioPorGrupo(Document doc, String grupoID) throws Exception {
+    public List<Map<String, String>> listaUsuarioPorGrupo(String grupoID) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
+        Document doc = new Builder().build(repositorio.downloadFile(BibliotecaArquivos.USUARIO_GRUPO));
         List<Map<String, String>> all = this.listarUsuarios(doc);
 
         all.removeIf((Map<String, String> t) -> {
@@ -128,7 +129,20 @@ public class UsuarioGerenciador {
                 return true;
             }
         });
-        
+
         return all;
+    }
+
+    public Map<String, String> usuarioByEmailSenha(String email, String senha) throws Exception {
+        Repositorio repositorio = new GDriveRepositorio();
+        Document doc = new Builder().build(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
+        
+        List<Map<String, String>> all = this.listarUsuarios(doc);
+
+        all.removeIf((Map<String, String> t) -> {
+            return !(t.get("email").equals(email) && t.get("senha").equals(senha));
+        });
+
+        return all.size() >= 1? all.get(0): null;
     }
 }
