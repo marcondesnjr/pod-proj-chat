@@ -31,14 +31,10 @@ import nu.xom.Serializer;
  */
 public class UsuarioGerenciador {
 
-    private Repositorio repositorio;
-
-    public UsuarioGerenciador(Repositorio repositorio) {
-        this.repositorio = repositorio;
-    }
-
+    
     public String cadastrarUsuario(String nome, String email, String senha) throws Exception {
-
+        Repositorio repositorio = new GDriveRepositorio();
+        
         UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
@@ -63,6 +59,8 @@ public class UsuarioGerenciador {
     }
 
     public void escreverUsuario(List<Map<String, String>> list) throws Exception {
+        Repositorio repositorio = new GDriveRepositorio();
+        
         Element root = new Element("usuarios");
         for (Map<String, String> map : list) {
             Element usrEl = new Element("usuario");

@@ -10,5 +10,5 @@ package ifpb.pod.proj.appdata.repositorio;
  * @author José Marcondes do Nascimento Junior
  */
 public enum BibliotecaArquivos {
-    USUARIOS,MENSAGENS,NOTIFICACOES
+    USUARIOS,MENSAGENS,MENSAGEM_USUARIO
 }

@@ -30,18 +30,8 @@ import nu.xom.Serializer;
  */
 public class MensagemGerenciador {
 
-    private Repositorio repositorio;
-
-    public static void main(String[] args) throws Exception {
-        new MensagemGerenciador(new GDriveRepositorio()).cadastrarMensagem("id", "data", "grupo");
-    }
-
-    public MensagemGerenciador(Repositorio repositorio) {
-        this.repositorio = repositorio;
-    }
-
     public String cadastrarMensagem(String usrId, String dataTime, String grupoId) throws Exception {
-
+        Repositorio repositorio = new GDriveRepositorio();
         UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
@@ -86,6 +76,7 @@ public class MensagemGerenciador {
     }
 
     public void escreverMensagem(List<Map<String, String>> list) throws Exception {
+        Repositorio repositorio = new GDriveRepositorio();
         Element root = new Element("mensagens");
         for (Map<String, String> map : list) {
             Element mensagemEl = new Element("mensagem");
