@@ -31,7 +31,7 @@ import nu.xom.Serializer;
  */
 public class MensagemGerenciador {
 
-    public String cadastrarMensagem(String usrId, String dataTime, String grupoId) throws Exception {
+    public String cadastrarMensagem(String usrId, String dataTime, String grupoId, String conteudo) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
         UUID id = UUID.randomUUID();
 
@@ -40,13 +40,14 @@ public class MensagemGerenciador {
 
         Document doc = builder.build(is);
 
-        List<Map<String, String>> list = listarMensagens(doc);
+        List<Map<String, String>> list = listarMensagens();
 
         HashMap<String, String> map = new HashMap();
         map.put("id", id.toString());
         map.put("usuarioId", usrId);
         map.put("dataTime", dataTime);
         map.put("grupoId", grupoId);
+        map.put("conteudo", conteudo);
 
         list.add(map);
 
@@ -65,7 +66,7 @@ public class MensagemGerenciador {
 
         Document doc = builder.build(is);
 
-        List<Map<String, String>> list = listarMensagens(doc);
+        List<Map<String, String>> list = listarMensagens();
 
         HashMap<String, String> map = new HashMap();
         map.put("mensagemId", msgId);
@@ -80,7 +81,11 @@ public class MensagemGerenciador {
         return id.toString();
     }
 
-    public List<Map<String, String>> listarMensagens(Document doc) {
+    public List<Map<String, String>> listarMensagens() throws Exception {
+        Builder builder = new Builder();
+        Repositorio repositorio = new GDriveRepositorio();
+        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.MENSAGENS));
+        Document doc = builder.build(is);
         Element root = doc.getRootElement();
         Elements childs = root.getChildElements("mensagem");
         List<Map<String, String>> list = new ArrayList<>();
@@ -91,10 +96,12 @@ public class MensagemGerenciador {
             String userId = atual.getChild(3).getValue();
             String dataTime = atual.getChild(5).getValue();
             String grupoId = atual.getChild(7).getValue();
+            String conteudo = atual.getChild(9).getValue();
             map.put("id", idValue);
             map.put("usuarioId", userId);
             map.put("dataTime", dataTime);
             map.put("grupoId", grupoId);
+            map.put("conteudo", conteudo);
             list.add(map);
         }
         return list;
@@ -113,10 +120,13 @@ public class MensagemGerenciador {
             dataTimeEl.appendChild(map.get("dataTime"));
             Element grupoIdEl = new Element("grupoId");
             grupoIdEl.appendChild(map.get("grupoId"));
+            Element contentEl = new Element("conteudo");
+            grupoIdEl.appendChild(map.get("conteudo"));
             mensagemEl.appendChild(idEl);
             mensagemEl.appendChild(usuarioIdEl);
             mensagemEl.appendChild(dataTimeEl);
             mensagemEl.appendChild(grupoIdEl);
+            mensagemEl.appendChild(contentEl);
             root.appendChild(mensagemEl);
         }
 
@@ -191,5 +201,13 @@ public class MensagemGerenciador {
             list.add(map);
         }
         return list;
+    }
+
+    public List<Map<String, String>> listarMensagensPendentes() throws Exception {
+        List<Map<String, String>> all = this.listarMensagens();
+        all.removeIf((Map<String, String> t) -> {
+            return !t.get("status").equals("pendente");
+        });
+        return all;
     }
 }

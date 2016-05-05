@@ -7,6 +7,7 @@ package ifpb.pod.proj.appdata.socket;
 
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
+import ifpb.pod.proj.appdata.transation.Operador;
 import ifpb.pod.proj.appdata.util.StringCommand;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -54,6 +55,8 @@ public class SocketServerS {
                     else{
                         socket.getOutputStream().write("false".getBytes());
                     }
+                }else if(map.get("command").equals("escreverMensagem")){
+                    new Operador().escreverMensagem(map.get("email"), map.get("dataTime"), map.get("grupoId"), map.get("conteudo"));
                 }
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
