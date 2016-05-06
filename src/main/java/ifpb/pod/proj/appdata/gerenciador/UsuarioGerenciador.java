@@ -5,13 +5,11 @@
  */
 package ifpb.pod.proj.appdata.gerenciador;
 
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import ifpb.pod.proj.appdata.repositorio.GDriveRepositorio;
 import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,15 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.function.Predicate;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
-import nu.xom.ParsingException;
 import nu.xom.Serializer;
-import nu.xom.ValidityException;
 
 /**
  *

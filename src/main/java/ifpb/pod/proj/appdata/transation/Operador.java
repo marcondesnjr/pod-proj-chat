@@ -3,7 +3,9 @@ package ifpb.pod.proj.appdata.transation;
 
 import ifpb.pod.proj.appdata.gerenciador.GrupoGerenciador;
 import ifpb.pod.proj.appdata.gerenciador.MensagemGerenciador;
+import ifpb.pod.proj.appdata.gerenciador.TXTNotificacao;
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -32,6 +34,24 @@ public class Operador {
         if(grupo != null){
             grupoGerenciador.entrarGrupo(usrEmail, groupId);
         }
+    }
+    
+    public List<Map<String, String>> listarMensagensPendentes() throws Exception{
+        MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
+        return mensagemGerenciador.listarMensagensPendentes();
+    }
+    
+    public List<Map<String, String>> listarMensagens() throws Exception{
+       MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
+        return mensagemGerenciador.listarMensagens();
+    }
+    
+    public String criarNotificacao(String text) throws IOException{
+        return new TXTNotificacao().criarNotificacao(text);
+    }
+    
+    public void alterarEstadoNotificado(String id) throws Exception{
+        new MensagemGerenciador().estadoNotificado(id);
     }
     
 }

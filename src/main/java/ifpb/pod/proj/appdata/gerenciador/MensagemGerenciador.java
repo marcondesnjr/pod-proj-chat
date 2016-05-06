@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -59,10 +60,11 @@ public class MensagemGerenciador {
     }
 
     public void cadastrarMensagemUsuario(String msgId, String usrId, String status) throws Exception {
-
+        UUID id = UUID.randomUUID();
         List<Map<String, String>> list = listarMensagensUsuario();
 
         HashMap<String, String> map = new HashMap();
+        map.put("id", id.toString());
         map.put("mensagemId", msgId);
         map.put("usuarioId", usrId);
         map.put("status", status);
@@ -146,6 +148,9 @@ public class MensagemGerenciador {
         for (Map<String, String> map : list) {
             Element mensagemUsuarioEl = new Element("mensagemUsuario");
 
+            Element idEl = new Element("id");
+            idEl.appendChild(map.get("id"));
+
             Element msgId = new Element("mensagemId");
             msgId.appendChild(map.get("mensagemId"));
 
@@ -155,6 +160,7 @@ public class MensagemGerenciador {
             Element statusEl = new Element("status");
             statusEl.appendChild(map.get("status"));
 
+            mensagemUsuarioEl.appendChild(idEl);
             mensagemUsuarioEl.appendChild(msgId);
             mensagemUsuarioEl.appendChild(usuarioIdEl);
             mensagemUsuarioEl.appendChild(statusEl);
@@ -183,16 +189,18 @@ public class MensagemGerenciador {
         Repositorio repositorio = new DBoxRepositorio();
         InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.MENSAGEM_USUARIO));
         Document doc = builder.build(is);
-        
+
         Element root = doc.getRootElement();
         Elements childs = root.getChildElements("mensagemUsuario");
         List<Map<String, String>> list = new ArrayList<>();
         for (int i = 0; i < childs.size(); i++) {
             Element atual = childs.get(i);
             HashMap<String, String> map = new HashMap<>();
-            String mensagemId = atual.getChild(1).getValue();
-            String usuarioId = atual.getChild(3).getValue();
-            String status = atual.getChild(5).getValue();
+            String id = atual.getChild(1).getValue();
+            String mensagemId = atual.getChild(3).getValue();
+            String usuarioId = atual.getChild(5).getValue();
+            String status = atual.getChild(7).getValue();
+            map.put("id", id);
             map.put("mensagemId", mensagemId);
             map.put("usuarioId", usuarioId);
             map.put("status", status);
@@ -202,10 +210,20 @@ public class MensagemGerenciador {
     }
 
     public List<Map<String, String>> listarMensagensPendentes() throws Exception {
-        List<Map<String, String>> all = this.listarMensagens();
+        List<Map<String, String>> all = this.listarMensagensUsuario();
         all.removeIf((Map<String, String> t) -> {
             return !t.get("status").equals("pendente");
         });
         return all;
+    }
+    
+    public void estadoNotificado(String id) throws Exception{
+        List<Map<String, String>> all = listarMensagensUsuario();
+        for (Map<String, String> map : all) {
+            if(map.get("id").equals(id)){
+                map.put("status", "notificado");
+            }
+        }
+        escreverMensagemUsuario(all);
     }
 }

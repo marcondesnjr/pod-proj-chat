@@ -22,7 +22,7 @@ public class TXTNotificacao {
 
     public String criarNotificacao(String content) throws IOException  {
 
-        File filetxt = File.createTempFile("not", ".txt", new File(""));
+        File filetxt = File.createTempFile("not", ".txt", new File(this.getClass().getResource("/msg/").getFile()));
         FileUtils.write(filetxt, content);
         
         String fileName = filetxt.getName();
@@ -33,7 +33,7 @@ public class TXTNotificacao {
     }
 
     public String recuperarByToken(String token) throws IOException {
-        return FileUtils.readFileToString(new File(token+".txt"));
+        return FileUtils.readFileToString(new File(this.getClass().getResource("/msg/").getFile(),token+".txt"));
     }
 
 }

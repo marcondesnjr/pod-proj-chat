@@ -21,10 +21,13 @@ public class StringCommand {
         String commandSplit[] = params.split("\\?");
         map.put("command", commandSplit[0]);
 
-        String[] paramsSpit = commandSplit[1].split("&");
-        for (String param : paramsSpit) {
-            String[] keyValue = param.split("=");
-            map.put(keyValue[0], keyValue[1]);
+        if (commandSplit.length > 1) {
+            String[] paramsSpit = commandSplit[1].split("&");
+            for (String param : paramsSpit) {
+                String[] keyValue = param.split("=");
+                map.put(keyValue[0], keyValue[1]);
+            }
+
         }
         return map;
     }

@@ -5,14 +5,14 @@
  */
 package ifpb.pod.proj.appdata.socket;
 
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
 import ifpb.pod.proj.appdata.transation.Operador;
 import ifpb.pod.proj.appdata.util.StringCommand;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +26,6 @@ public class SocketServerS {
     public void init() throws IOException {
         ServerSocket serverSocket = new ServerSocket(10999);
         while (true) {
-            String resp = null;
             Socket socket = serverSocket.accept();
             try {
                 byte[] b = new byte[1024];
@@ -45,7 +44,18 @@ public class SocketServerS {
                     new Operador().escreverMensagem(map.get("email"), map.get("dateTime"), map.get("grupoId"), map.get("conteudo"));
                 } else if (map.get("command").equals("entrarGrupo")) {
                     new Operador().entrarGrupo(map.get("email"), map.get("grupoId"));
-                } 
+                } else if(map.get("command").equals("listarPendentes")){
+                    List<Map<String, String>> resp = new Operador().listarMensagensPendentes();
+                    new ObjectOutputStream(socket.getOutputStream()).writeObject(resp);
+                }else if(map.get("command").equals("listarMensagens")){
+                    List<Map<String, String>> resp = new Operador().listarMensagens();
+                    new ObjectOutputStream(socket.getOutputStream()).writeObject(resp);
+                }else if(map.get("command").equals("criarNotificacao")){
+                    String resp = new Operador().criarNotificacao(map.get("text"));
+                    socket.getOutputStream().write(resp.getBytes("UTF-8"));
+                }else if(map.get("command").equals("estadoNotificado")){
+                    new Operador().alterarEstadoNotificado(map.get("id"));
+                }
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception ex) {
