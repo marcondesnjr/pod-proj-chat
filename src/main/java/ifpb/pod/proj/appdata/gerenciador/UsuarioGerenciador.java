@@ -11,6 +11,7 @@ import ifpb.pod.proj.appdata.repositorio.BibliotecaArquivos;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,12 +38,7 @@ public class UsuarioGerenciador {
     public void cadastrarUsuario(String nome, String email, String senha) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
 
-        Builder builder = new Builder();
-        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
-
-        Document doc = builder.build(is);
-
-        List<Map<String, String>> list = listarUsuarios(doc);
+        List<Map<String, String>> list = listarUsuarios();
 
         HashMap<String, String> usr = new HashMap();
         usr.put("nome", nome);
@@ -58,7 +54,6 @@ public class UsuarioGerenciador {
 
     public void escreverUsuario(List<Map<String, String>> list) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
-
         Element root = new Element("usuarios");
         for (Map<String, String> map : list) {
             Element usrEl = new Element("usuario");
@@ -89,8 +84,12 @@ public class UsuarioGerenciador {
         repositorio.updateFile(usrFile, BibliotecaArquivos.USUARIOS);
     }
 
-    public List<Map<String, String>> listarUsuarios(Document doc) {
+    public List<Map<String, String>> listarUsuarios() throws Exception {
+        Repositorio repositorio = new GDriveRepositorio();
+        Builder builder = new Builder();
+        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
 
+        Document doc = builder.build(is);
         Element root = doc.getRootElement();
         Elements childs = root.getChildElements();
         List<Map<String, String>> list = new ArrayList<>();
@@ -110,30 +109,41 @@ public class UsuarioGerenciador {
 
     public List<Map<String, String>> listaUsuarioPorGrupo(String grupoID) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
-        Document doc = new Builder().build(repositorio.downloadFile(BibliotecaArquivos.USUARIO_GRUPO));
-        List<Map<String, String>> all = this.listarUsuarios(doc);
+        List<Map<String, String>> allUsrGrp = new GrupoGerenciador().listarUsuarioGrupo();
 
-        all.removeIf((Map<String, String> t) -> {
-            if (t.get("grupoId").equals(grupoID)) {
+        allUsrGrp.removeIf((Map<String, String> t) -> {
+            if (t.get("idGrp").equals(grupoID)) {
                 return false;
             } else {
                 return true;
             }
         });
 
-        return all;
+        List<Map<String, String>> allUsrs = this.listarUsuarios();
+
+        allUsrs.removeIf((Map<String, String> t) -> {
+            boolean has = false;
+            for(Map<String,String> map: allUsrGrp){
+                if(map.get("idUsr").equals(t.get("email"))){
+                    has = true;
+                }
+            }
+            return !has;
+        });
+
+        return allUsrs;
     }
 
     public Map<String, String> usuarioByEmailSenha(String email, String senha) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
         Document doc = new Builder().build(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
-        
-        List<Map<String, String>> all = this.listarUsuarios(doc);
+
+        List<Map<String, String>> all = this.listarUsuarios();
 
         all.removeIf((Map<String, String> t) -> {
             return !(t.get("email").equals(email) && t.get("senha").equals(senha));
         });
 
-        return all.size() >= 1? all.get(0): null;
+        return all.size() >= 1 ? all.get(0) : null;
     }
 }

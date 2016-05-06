@@ -42,10 +42,10 @@ public class SocketServerS {
                         socket.getOutputStream().write("false".getBytes());
                     }
                 } else if (map.get("command").equals("escreverMensagem")) {
-                    new Operador().escreverMensagem(map.get("email"), map.get("dataTime"), map.get("grupoId"), map.get("conteudo"));
+                    new Operador().escreverMensagem(map.get("email"), map.get("dateTime"), map.get("grupoId"), map.get("conteudo"));
                 } else if (map.get("command").equals("entrarGrupo")) {
                     new Operador().entrarGrupo(map.get("email"), map.get("grupoId"));
-                }
+                } 
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception ex) {

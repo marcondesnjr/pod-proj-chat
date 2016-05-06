@@ -57,7 +57,7 @@ public class DBoxRepositorio implements Repositorio {
 
     @Override
     public File downloadFile(BibliotecaArquivos b) throws Exception {
-        if (b == b.MENSAGEM_USUARIO) {
+        if (b == BibliotecaArquivos.MENSAGEM_USUARIO) {
             return downloadMensagemUsuarioFile();
         }
         return null;

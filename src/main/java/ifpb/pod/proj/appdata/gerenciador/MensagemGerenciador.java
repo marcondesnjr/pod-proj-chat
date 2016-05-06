@@ -11,6 +11,7 @@ import ifpb.pod.proj.appdata.repositorio.DBoxRepositorio;
 import ifpb.pod.proj.appdata.repositorio.Repositorio;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,16 +58,9 @@ public class MensagemGerenciador {
         return id.toString();
     }
 
-    public String cadastrarMensagemUsuario(String msgId, String usrId, String status) throws Exception {
-        Repositorio repositorio = new DBoxRepositorio();
-        UUID id = UUID.randomUUID();
+    public void cadastrarMensagemUsuario(String msgId, String usrId, String status) throws Exception {
 
-        Builder builder = new Builder();
-        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.MENSAGEM_USUARIO));
-
-        Document doc = builder.build(is);
-
-        List<Map<String, String>> list = listarMensagens();
+        List<Map<String, String>> list = listarMensagensUsuario();
 
         HashMap<String, String> map = new HashMap();
         map.put("mensagemId", msgId);
@@ -78,7 +72,6 @@ public class MensagemGerenciador {
         escreverMensagemUsuario(list);
 
         System.out.println(list);
-        return id.toString();
     }
 
     public List<Map<String, String>> listarMensagens() throws Exception {
@@ -121,7 +114,7 @@ public class MensagemGerenciador {
             Element grupoIdEl = new Element("grupoId");
             grupoIdEl.appendChild(map.get("grupoId"));
             Element contentEl = new Element("conteudo");
-            grupoIdEl.appendChild(map.get("conteudo"));
+            contentEl.appendChild(map.get("conteudo"));
             mensagemEl.appendChild(idEl);
             mensagemEl.appendChild(usuarioIdEl);
             mensagemEl.appendChild(dataTimeEl);
@@ -185,7 +178,12 @@ public class MensagemGerenciador {
         repositorio.updateFile(usrFile, BibliotecaArquivos.MENSAGEM_USUARIO);
     }
 
-    public List<Map<String, String>> listarMensagensUsuario(Document doc) {
+    public List<Map<String, String>> listarMensagensUsuario() throws Exception {
+        Builder builder = new Builder();
+        Repositorio repositorio = new DBoxRepositorio();
+        InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.MENSAGEM_USUARIO));
+        Document doc = builder.build(is);
+        
         Element root = doc.getRootElement();
         Elements childs = root.getChildElements("mensagemUsuario");
         List<Map<String, String>> list = new ArrayList<>();
