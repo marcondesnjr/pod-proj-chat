@@ -154,10 +154,18 @@ public class GDriveRepositorio implements Repositorio {
 
     @Override
     public void updateFile(java.io.File fl, BibliotecaArquivos b) throws FileNotFoundException, Exception {
-        if (b == b.USUARIOS) {
-            updateUsrFile(fl);
-        } else if (b == b.MENSAGENS) {
-            updateMsgFile(fl);
+        if (null != b) switch (b) {
+            case USUARIOS:
+                updateUsrFile(fl);
+                break;
+            case MENSAGENS:
+                updateMsgFile(fl);
+                break;
+            case USUARIO_GRUPO:
+                updateUsrGpFile(fl);
+                break;
+            default:
+                break;
         }
     }
 
@@ -188,6 +196,8 @@ public class GDriveRepositorio implements Repositorio {
                 return dowloadMsgFile();
             case USUARIO_GRUPO:
                 return dowloadUsrGpFile();
+            case GRUPO:
+                return dowloadGpFile();
             default:
                 return null;
         }
@@ -203,7 +213,7 @@ public class GDriveRepositorio implements Repositorio {
     }
 
     private java.io.File dowloadMsgFile() throws IOException, Exception, FileNotFoundException {
-        File userFilesMeta = getDriveService().files().get(USRFILE).execute();
+        File userFilesMeta = getDriveService().files().get(MSGFILE).execute();
         OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/mensagens.xml").getFile());
         MediaHttpDownloader downloader = new MediaHttpDownloader(HTTP_TRANSPORT, getDriveService().getRequestFactory().getInitializer());
         downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
@@ -215,16 +225,33 @@ public class GDriveRepositorio implements Repositorio {
         body.setTitle("usuario_grupo.xml");
         body.setMimeType("text/xml");
         InputStreamContent mediaContent = new InputStreamContent("text/xml", new BufferedInputStream(new FileInputStream(fl)));
-        Drive.Files.Update request = getDriveService().files().update(MSGFILE, body, mediaContent);
+        Drive.Files.Update request = getDriveService().files().update(USRGRP, body, mediaContent);
         request.execute();
     }
 
     private java.io.File dowloadUsrGpFile() throws IOException, Exception, FileNotFoundException {
-        File userFilesMeta = getDriveService().files().get(USRFILE).execute();
+        File userFilesMeta = getDriveService().files().get(USRGRP).execute();
         OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/usuario_grupo.xml").getFile());
         MediaHttpDownloader downloader = new MediaHttpDownloader(HTTP_TRANSPORT, getDriveService().getRequestFactory().getInitializer());
         downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
         return new java.io.File(this.getClass().getResource("/downloads/usuario_grupo.xml").getFile());
+    }
+    
+    private void updateGpFile(java.io.File fl) throws IOException, Exception, FileNotFoundException {
+        File body = new File();
+        body.setTitle("grupos.xml");
+        body.setMimeType("text/xml");
+        InputStreamContent mediaContent = new InputStreamContent("text/xml", new BufferedInputStream(new FileInputStream(fl)));
+        Drive.Files.Update request = getDriveService().files().update(GRUPOFILE, body, mediaContent);
+        request.execute();
+    }
+    
+    private java.io.File dowloadGpFile() throws IOException, Exception, FileNotFoundException {
+        File userFilesMeta = getDriveService().files().get(GRUPOFILE).execute();
+        OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/grupos.xml").getFile());
+        MediaHttpDownloader downloader = new MediaHttpDownloader(HTTP_TRANSPORT, getDriveService().getRequestFactory().getInitializer());
+        downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
+        return new java.io.File(this.getClass().getResource("/downloads/grupos.xml").getFile());
     }
 
 }

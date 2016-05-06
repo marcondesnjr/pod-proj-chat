@@ -1,6 +1,7 @@
 
 package ifpb.pod.proj.appdata.transation;
 
+import ifpb.pod.proj.appdata.gerenciador.GrupoGerenciador;
 import ifpb.pod.proj.appdata.gerenciador.MensagemGerenciador;
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
 import java.util.List;
@@ -21,5 +22,12 @@ public class Operador {
         }
     }
     
+    public void entrarGrupo(String usrEmail, String groupId) throws Exception{
+        GrupoGerenciador grupoGerenciador = new GrupoGerenciador();
+        Map<String,String> grupo = grupoGerenciador.grupoById(groupId);
+        if(grupo != null){
+            grupoGerenciador.entrarGrupo(usrEmail, groupId);
+        }
+    }
     
 }

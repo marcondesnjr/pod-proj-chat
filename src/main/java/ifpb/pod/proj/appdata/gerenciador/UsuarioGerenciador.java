@@ -34,10 +34,8 @@ import nu.xom.ValidityException;
  */
 public class UsuarioGerenciador {
 
-    public String cadastrarUsuario(String nome, String email, String senha) throws Exception {
+    public void cadastrarUsuario(String nome, String email, String senha) throws Exception {
         Repositorio repositorio = new GDriveRepositorio();
-
-        UUID id = UUID.randomUUID();
 
         Builder builder = new Builder();
         InputStream is = new FileInputStream(repositorio.downloadFile(BibliotecaArquivos.USUARIOS));
@@ -47,7 +45,6 @@ public class UsuarioGerenciador {
         List<Map<String, String>> list = listarUsuarios(doc);
 
         HashMap<String, String> usr = new HashMap();
-        usr.put("id", id.toString());
         usr.put("nome", nome);
         usr.put("email", email);
         usr.put("senha", senha);
@@ -57,7 +54,6 @@ public class UsuarioGerenciador {
         escreverUsuario(list);
 
         System.out.println(list);
-        return id.toString();
     }
 
     public void escreverUsuario(List<Map<String, String>> list) throws Exception {
@@ -66,15 +62,12 @@ public class UsuarioGerenciador {
         Element root = new Element("usuarios");
         for (Map<String, String> map : list) {
             Element usrEl = new Element("usuario");
-            Element idEl = new Element("id");
-            idEl.appendChild(map.get("id"));
             Element nameEl = new Element("nome");
             nameEl.appendChild(map.get("nome"));
             Element emailEl = new Element("email");
             emailEl.appendChild(map.get("email"));
             Element senhaEl = new Element("senha");
             senhaEl.appendChild(map.get("senha"));
-            usrEl.appendChild(idEl);
             usrEl.appendChild(nameEl);
             usrEl.appendChild(emailEl);
             usrEl.appendChild(senhaEl);
@@ -104,11 +97,9 @@ public class UsuarioGerenciador {
         for (int i = 0; i < childs.size(); i++) {
             Element atual = childs.get(i);
             HashMap<String, String> map = new HashMap<>();
-            String idValue = atual.getChild(1).getValue();
-            String nameValue = atual.getChild(3).getValue();
-            String emailValue = atual.getChild(5).getValue();
-            String senhaValue = atual.getChild(7).getValue();
-            map.put("id", idValue);
+            String nameValue = atual.getChild(1).getValue();
+            String emailValue = atual.getChild(3).getValue();
+            String senhaValue = atual.getChild(5).getValue();
             map.put("email", emailValue);
             map.put("senha", senhaValue);
             map.put("nome", nameValue);

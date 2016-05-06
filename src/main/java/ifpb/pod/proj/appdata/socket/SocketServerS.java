@@ -28,7 +28,35 @@ public class SocketServerS {
         while (true) {
             String resp = null;
             Socket socket = serverSocket.accept();
-            new ExecComand(socket).start();
+            try {
+                byte[] b = new byte[1024];
+                socket.getInputStream().read(b);
+                Map<String, String> map = StringCommand.convert(new String(b).trim());
+                if (map.get("command").equals("cadastrarUsuario")) {
+                    new UsuarioGerenciador().cadastrarUsuario(map.get("nome"), map.get("email"), map.get("senha"));
+                } else if (map.get("command").equals("hasUsuario")) {
+                    Map<String, String> usr = new UsuarioGerenciador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
+                    if (usr != null) {
+                        socket.getOutputStream().write("true".getBytes());
+                    } else {
+                        socket.getOutputStream().write("false".getBytes());
+                    }
+                } else if (map.get("command").equals("escreverMensagem")) {
+                    new Operador().escreverMensagem(map.get("email"), map.get("dataTime"), map.get("grupoId"), map.get("conteudo"));
+                } else if (map.get("command").equals("entrarGrupo")) {
+                    new Operador().entrarGrupo(map.get("email"), map.get("grupoId"));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }       
         }
     }
 
@@ -48,15 +76,17 @@ public class SocketServerS {
                 Map<String, String> map = StringCommand.convert(new String(b).trim());
                 if (map.get("command").equals("cadastrarUsuario")) {
                     new UsuarioGerenciador().cadastrarUsuario(map.get("nome"), map.get("email"), map.get("senha"));
-                }else if(map.get("command").equals("hasUsuario")){
-                    Map<String,String> usr = new UsuarioGerenciador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
-                    if(usr != null)
+                } else if (map.get("command").equals("hasUsuario")) {
+                    Map<String, String> usr = new UsuarioGerenciador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
+                    if (usr != null) {
                         socket.getOutputStream().write("true".getBytes());
-                    else{
+                    } else {
                         socket.getOutputStream().write("false".getBytes());
                     }
-                }else if(map.get("command").equals("escreverMensagem")){
+                } else if (map.get("command").equals("escreverMensagem")) {
                     new Operador().escreverMensagem(map.get("email"), map.get("dataTime"), map.get("grupoId"), map.get("conteudo"));
+                } else if (map.get("command").equals("entrarGrupo")) {
+                    new Operador().entrarGrupo(map.get("email"), map.get("grupoId"));
                 }
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);
