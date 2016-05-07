@@ -5,7 +5,6 @@ import ifpb.pod.proj.appdata.gerenciador.MensagemGerenciador;
 import ifpb.pod.proj.appdata.gerenciador.MensagemUsuarioGerenciador;
 import ifpb.pod.proj.appdata.gerenciador.TXTNotificacao;
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -78,8 +77,9 @@ public class Operador {
         try {
             txm.prepareAll();
             MensagemUsuarioGerenciador mensagemGerenciador = new MensagemUsuarioGerenciador();
+            List<Map<String, String>> resp = mensagemGerenciador.listarMensagensPendentes();
             txm.commitAll();
-            return mensagemGerenciador.listarMensagensPendentes();
+            return resp;
         } catch (Exception ex) {
             txm.rollbackAll();
             throw ex;
@@ -91,8 +91,10 @@ public class Operador {
         try {
             txm.prepareAll();
             MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
+
+            List<Map<String, String>> resp = mensagemGerenciador.listarMensagens();
             txm.commitAll();
-            return mensagemGerenciador.listarMensagens();
+            return resp;
         } catch (Exception ex) {
             txm.rollbackAll();
             throw ex;
@@ -100,15 +102,8 @@ public class Operador {
     }
 
     public String criarNotificacao(String text) throws Exception {
-        TransactionManager txm = new TxManager();
-        try {
-            txm.prepareAll();
-            txm.commitAll();
-            return new TXTNotificacao().criarNotificacao(text);
-        } catch (Exception ex) {
-            txm.rollbackAll();
-            throw ex;
-        }
+        return new TXTNotificacao().criarNotificacao(text);
+
     }
 
     public void alterarEstadoNotificado(String id) throws Exception {
@@ -123,12 +118,19 @@ public class Operador {
         }
     }
 
-    public String getNotificacao(String token) throws Exception{
+    public String getNotificacao(String token) throws Exception {
+        String resp = new TXTNotificacao().recuperarByToken(token);
+        return resp;
+    }
+
+    public void excluirUsuario(String email) throws Exception {
         TransactionManager txm = new TxManager();
         try {
-            String resp = new TXTNotificacao().recuperarByToken(token);
+            txm.prepareAll();
+            new UsuarioGerenciador().excluirUsuario(email);
+            new GrupoGerenciador().excluirTodosGrupo(email);
+            new MensagemUsuarioGerenciador().excluirMsgParaUsuario(email);
             txm.commitAll();
-            return resp;
         } catch (Exception ex) {
             txm.rollbackAll();
             throw ex;

@@ -134,5 +134,17 @@ public class GrupoGerenciador {
         });
         return all.size() >= 1 ? all.get(0) : null;
     }
+    
+    public void excluirTodosGrupo(String email) throws Exception{
+        List<Map<String, String>> all = listarUsuarioGrupo();
+        for (int i = 0; i < all.size(); i++) {
+            Map<String, String> atual = all.get(i);
+            if(atual.get("idUsr").equals(email)){
+                all.remove(i);
+            }
+        }
+        
+        escreverEntrarGrupo(all);
+    }
 
 }

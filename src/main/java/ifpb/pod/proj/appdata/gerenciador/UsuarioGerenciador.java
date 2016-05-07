@@ -117,8 +117,8 @@ public class UsuarioGerenciador {
 
         allUsrs.removeIf((Map<String, String> t) -> {
             boolean has = false;
-            for(Map<String,String> map: allUsrGrp){
-                if(map.get("idUsr").equals(t.get("email"))){
+            for (Map<String, String> map : allUsrGrp) {
+                if (map.get("idUsr").equals(t.get("email"))) {
                     has = true;
                 }
             }
@@ -140,4 +140,17 @@ public class UsuarioGerenciador {
 
         return all.size() >= 1 ? all.get(0) : null;
     }
+
+    public void excluirUsuario(String email) throws Exception {
+        List<Map<String, String>> all = this.listarUsuarios();
+        
+        for (int i = 0; i < all.size(); i++) {
+            Map<String, String> atual = all.get(i);
+            if(atual.get("email").equals(email)){
+                all.remove(i);
+            }
+        }
+        escreverUsuario(all);
+    }
+
 }

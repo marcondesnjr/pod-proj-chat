@@ -56,6 +56,8 @@ public class SocketServerS {
                     socket.getOutputStream().write(resp.getBytes("UTF-8"));
                 }else if(map.get("command").equals("estadoNotificado")){
                     new Operador().alterarEstadoNotificado(map.get("id"));
+                }else if (map.get("command").equals("excuirUsuario")){
+                    new Operador().excluirUsuario(map.get("email"));
                 }
             } catch (IOException ex) {
                 Logger.getLogger(SocketServerS.class.getName()).log(Level.SEVERE, null, ex);

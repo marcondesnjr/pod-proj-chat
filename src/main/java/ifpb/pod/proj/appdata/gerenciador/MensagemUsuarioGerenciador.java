@@ -132,4 +132,20 @@ public class MensagemUsuarioGerenciador {
 
         System.out.println(list);
     }
+    
+    public void excluirMsgParaUsuario(String email) throws Exception{
+        List<Map<String, String>> all = listarMensagensUsuario();
+        
+        for (int i = 0; i < all.size(); i++) {
+            Map<String, String> atual = all.get(i);
+            if(atual.get("usuarioId").equals(email)
+                    && atual.get("status").equals("pendente")){
+                all.remove(i);
+            }
+        }
+        
+        escreverMensagemUsuario(all);
+        
+    }
+    
 }
