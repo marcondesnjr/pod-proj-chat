@@ -26,14 +26,16 @@ public class TXTNotificacao {
         FileUtils.write(filetxt, content);
         
         String fileName = filetxt.getName();
-        String token = fileName.substring(0, fileName.length()-5);
+        String token = fileName.substring(0, fileName.length()-4);
         
         return token;
 
     }
 
     public String recuperarByToken(String token) throws IOException {
-        return FileUtils.readFileToString(new File(this.getClass().getResource("/msg/").getFile(),token+".txt"));
+        File fl = new File(this.getClass().getResource("/msg/").getFile(),token+".txt");
+        System.out.println("file: " + fl.getAbsolutePath()+" existe?: "+fl.exists());
+        return FileUtils.readFileToString(fl);
     }
 
 }

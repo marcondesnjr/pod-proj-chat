@@ -6,7 +6,7 @@
 package ifpb.pod.proj.appdata.socket;
 
 import ifpb.pod.proj.appdata.gerenciador.UsuarioGerenciador;
-import ifpb.pod.proj.appdata.transation.Operador;
+import ifpb.pod.proj.appdata.transaction.Operador;
 import ifpb.pod.proj.appdata.util.StringCommand;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -32,9 +32,9 @@ public class SocketServerS {
                 socket.getInputStream().read(b);
                 Map<String, String> map = StringCommand.convert(new String(b).trim());
                 if (map.get("command").equals("cadastrarUsuario")) {
-                    new UsuarioGerenciador().cadastrarUsuario(map.get("nome"), map.get("email"), map.get("senha"));
+                    new Operador().cadastrarUsuario(map.get("nome"), map.get("email"), map.get("senha"));
                 } else if (map.get("command").equals("hasUsuario")) {
-                    Map<String, String> usr = new UsuarioGerenciador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
+                    Map<String, String> usr = new Operador().usuarioByEmailSenha(map.get("email"), map.get("senha"));
                     if (usr != null) {
                         socket.getOutputStream().write("true".getBytes());
                     } else {
