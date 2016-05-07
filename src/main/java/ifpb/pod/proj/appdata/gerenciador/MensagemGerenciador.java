@@ -59,17 +59,18 @@ public class MensagemGerenciador {
         return id.toString();
     }
 
-    public void cadastrarMensagemUsuario(String msgId, String usrId, String status) throws Exception {
+    public void cadastrarMensagemUsuario(String msgId, List<Map<String, String>> usrs, String status) throws Exception {
         UUID id = UUID.randomUUID();
         List<Map<String, String>> list = listarMensagensUsuario();
 
-        HashMap<String, String> map = new HashMap();
-        map.put("id", id.toString());
-        map.put("mensagemId", msgId);
-        map.put("usuarioId", usrId);
-        map.put("status", status);
-
-        list.add(map);
+        for (Map<String, String> usr : usrs) {
+            HashMap<String, String> map = new HashMap();
+            map.put("id", id.toString());
+            map.put("mensagemId", msgId);
+            map.put("usuarioId",usr.get("email"));
+            map.put("status", status);
+            list.add(map);
+        }
 
         escreverMensagemUsuario(list);
 
@@ -216,11 +217,11 @@ public class MensagemGerenciador {
         });
         return all;
     }
-    
-    public void estadoNotificado(String id) throws Exception{
+
+    public void estadoNotificado(String id) throws Exception {
         List<Map<String, String>> all = listarMensagensUsuario();
         for (Map<String, String> map : all) {
-            if(map.get("id").equals(id)){
+            if (map.get("id").equals(id)) {
                 map.put("status", "notificado");
             }
         }

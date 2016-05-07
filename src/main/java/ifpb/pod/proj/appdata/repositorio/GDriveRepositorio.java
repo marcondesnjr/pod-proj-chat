@@ -51,6 +51,8 @@ public class GDriveRepositorio implements Repositorio {
     private static final String USRGRP = "0B9cCXHDSR9etb1BtWlBpUUpOZFk";
     private static final String GRUPOFILE = "0B9cCXHDSR9etTXJKcUZTZHNoQnM";
 
+    private static Drive drive;
+
     /**
      * Global instance of the {@link DataStoreFactory}. The best practice is to
      * make it a single globally shared instance across your application.
@@ -125,11 +127,14 @@ public class GDriveRepositorio implements Repositorio {
      * @throws IOException
      */
     private Drive getDriveService() throws IOException, Exception {
-        Credential credential = authorize();
-        return new Drive.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+        if (drive == null) {
+            Credential credential = authorize();
+            drive = new Drive.Builder(
+                    HTTP_TRANSPORT, JSON_FACTORY, credential)
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        }
+        return drive;
     }
 
 //    public static void main(String[] args) throws IOException, Exception {
@@ -151,21 +156,22 @@ public class GDriveRepositorio implements Repositorio {
 //            }
 //        }
 //    }
-
     @Override
     public void updateFile(java.io.File fl, BibliotecaArquivos b) throws FileNotFoundException, Exception {
-        if (null != b) switch (b) {
-            case USUARIOS:
-                updateUsrFile(fl);
-                break;
-            case MENSAGENS:
-                updateMsgFile(fl);
-                break;
-            case USUARIO_GRUPO:
-                updateUsrGpFile(fl);
-                break;
-            default:
-                break;
+        if (null != b) {
+            switch (b) {
+                case USUARIOS:
+                    updateUsrFile(fl);
+                    break;
+                case MENSAGENS:
+                    updateMsgFile(fl);
+                    break;
+                case USUARIO_GRUPO:
+                    updateUsrGpFile(fl);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -236,7 +242,7 @@ public class GDriveRepositorio implements Repositorio {
         downloader.download(new GenericUrl(userFilesMeta.getDownloadUrl()), out);
         return new java.io.File(this.getClass().getResource("/downloads/usuario_grupo.xml").getFile());
     }
-    
+
     private void updateGpFile(java.io.File fl) throws IOException, Exception, FileNotFoundException {
         File body = new File();
         body.setTitle("grupos.xml");
@@ -245,7 +251,7 @@ public class GDriveRepositorio implements Repositorio {
         Drive.Files.Update request = getDriveService().files().update(GRUPOFILE, body, mediaContent);
         request.execute();
     }
-    
+
     private java.io.File dowloadGpFile() throws IOException, Exception, FileNotFoundException {
         File userFilesMeta = getDriveService().files().get(GRUPOFILE).execute();
         OutputStream out = new FileOutputStream(this.getClass().getResource("/downloads/grupos.xml").getFile());

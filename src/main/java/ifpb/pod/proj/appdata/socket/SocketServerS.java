@@ -42,6 +42,7 @@ public class SocketServerS {
                     }
                 } else if (map.get("command").equals("escreverMensagem")) {
                     new Operador().escreverMensagem(map.get("email"), map.get("dateTime"), map.get("grupoId"), map.get("conteudo"));
+                    new ObjectOutputStream(socket.getOutputStream()).writeObject(Boolean.TRUE);
                 } else if (map.get("command").equals("entrarGrupo")) {
                     new Operador().entrarGrupo(map.get("email"), map.get("grupoId"));
                 } else if(map.get("command").equals("listarPendentes")){

@@ -26,17 +26,21 @@ import java.util.Locale;
  */
 public class DBoxRepositorio implements Repositorio {
 
+    private static DbxClientV1 client;
+
     private DbxClientV1 getClient() throws IOException, DbxException {
         // Get your app key and secret from the Dropbox developers website.
         final String APP_KEY = "tulnlckjybrc0u9";
         final String APP_SECRET = "gafb0hecfrimqfg";
         final String APP_TOKEN = "PEnCJ8aOSw0AAAAAAAAAFGl_5y4XJ05pI_9Y2WOUN5jUNjDguR6xWpn7PLeVc1DZ";
 
-        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+        if (client == null) {
+            DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 
-        DbxRequestConfig config = new DbxRequestConfig("pod-proj-chat/1.0",
-                Locale.getDefault().toString());
-        DbxClientV1 client = new DbxClientV1(config, APP_TOKEN);
+            DbxRequestConfig config = new DbxRequestConfig("pod-proj-chat/1.0",
+                    Locale.getDefault().toString());
+            client = new DbxClientV1(config, APP_TOKEN);
+        }
         return client;
     }
 

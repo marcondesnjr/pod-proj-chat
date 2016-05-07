@@ -1,4 +1,3 @@
-
 package ifpb.pod.proj.appdata.transation;
 
 import ifpb.pod.proj.appdata.gerenciador.GrupoGerenciador;
@@ -17,41 +16,40 @@ import java.util.function.Predicate;
 public class Operador {
 
     //Operação atomica
-    public void escreverMensagem(String usrId, String dateTime, String grupoId, String conteudo) throws Exception {
+    public boolean escreverMensagem(String usrId, String dateTime, String grupoId, String conteudo) throws Exception {
         String id = new MensagemGerenciador().cadastrarMensagem(usrId, dateTime, grupoId, conteudo);
         List<Map<String, String>> list = new UsuarioGerenciador().listaUsuarioPorGrupo(grupoId);
         list.removeIf((Map<String, String> t) -> {
             return t.get("email").equals(usrId);
         });
-        for (Map<String, String> usr : list) {
-            new MensagemGerenciador().cadastrarMensagemUsuario(id, usr.get("email"), "pendente");
-        }
+        new MensagemGerenciador().cadastrarMensagemUsuario(id, list, "pendente");
+        return true;
     }
-    
-    public void entrarGrupo(String usrEmail, String groupId) throws Exception{
+
+    public void entrarGrupo(String usrEmail, String groupId) throws Exception {
         GrupoGerenciador grupoGerenciador = new GrupoGerenciador();
-        Map<String,String> grupo = grupoGerenciador.grupoById(groupId);
-        if(grupo != null){
+        Map<String, String> grupo = grupoGerenciador.grupoById(groupId);
+        if (grupo != null) {
             grupoGerenciador.entrarGrupo(usrEmail, groupId);
         }
     }
-    
-    public List<Map<String, String>> listarMensagensPendentes() throws Exception{
+
+    public List<Map<String, String>> listarMensagensPendentes() throws Exception {
         MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
         return mensagemGerenciador.listarMensagensPendentes();
     }
-    
-    public List<Map<String, String>> listarMensagens() throws Exception{
-       MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
+
+    public List<Map<String, String>> listarMensagens() throws Exception {
+        MensagemGerenciador mensagemGerenciador = new MensagemGerenciador();
         return mensagemGerenciador.listarMensagens();
     }
-    
-    public String criarNotificacao(String text) throws IOException{
+
+    public String criarNotificacao(String text) throws IOException {
         return new TXTNotificacao().criarNotificacao(text);
     }
-    
-    public void alterarEstadoNotificado(String id) throws Exception{
+
+    public void alterarEstadoNotificado(String id) throws Exception {
         new MensagemGerenciador().estadoNotificado(id);
     }
-    
+
 }
