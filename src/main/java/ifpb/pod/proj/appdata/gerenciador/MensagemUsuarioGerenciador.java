@@ -116,11 +116,12 @@ public class MensagemUsuarioGerenciador {
     }
     
     public void cadastrarMensagemUsuario(String msgId, List<Map<String, String>> usrs, String status) throws Exception {
-        UUID id = UUID.randomUUID();
+        
         List<Map<String, String>> list = listarMensagensUsuario();
 
         for (Map<String, String> usr : usrs) {
             HashMap<String, String> map = new HashMap();
+            UUID id = UUID.randomUUID();
             map.put("id", id.toString());
             map.put("mensagemId", msgId);
             map.put("usuarioId",usr.get("email"));
